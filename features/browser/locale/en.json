@@ -1,0 +1,1 @@
+{ "meta": { "title": "Claude sidebar: open in Browser", "description": "Adds an open_in_browser tool and a chat row that opens an http or https address in a Browser tab of the right sidebar. It reads only the address you give it, does not fetch the page, and sends nothing outside dsh." } }

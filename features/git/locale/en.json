@@ -1,0 +1,1 @@
+{ "meta": { "title": "Claude sidebar: Git tab", "description": "Adds a Git tab that lists the repository's changed files, branch, commits and per-file diffs, including untracked files. It runs read-only git commands in the session folder and sends nothing outside dsh." } }

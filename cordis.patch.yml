@@ -1,0 +1,27 @@
+- insert:
+    - id: claude-sidebar
+      name: 'dsh-claude-sidebar'
+
+    - id: claude-sidebar-rail
+      name: 'dsh-claude-sidebar/rail'
+
+    - id: claude-sidebar-jobs
+      name: 'dsh-claude-sidebar/jobs'
+
+    - id: claude-sidebar-subagents
+      name: 'dsh-claude-sidebar/subagents'
+
+    - id: claude-sidebar-environment
+      name: 'dsh-claude-sidebar/environment'
+
+    - id: claude-sidebar-run
+      name: 'dsh-claude-sidebar/run'
+
+    - id: claude-sidebar-git
+      name: 'dsh-claude-sidebar/git'
+
+    - id: claude-sidebar-sizing
+      name: 'dsh-claude-sidebar/sizing'
+
+    - id: claude-sidebar-browser
+      name: 'dsh-claude-sidebar/browser'

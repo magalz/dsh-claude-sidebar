@@ -1,0 +1,1 @@
+{ "meta": { "title": "Claude sidebar", "description": "Claude-desktop-style panels for the DeepSeek Harness right sidebar: an icon rail and tabs for the open session. Each feature is its own plugin row, so you can switch one off without disabling the others. It reads and runs inside dsh and sends nothing outside dsh." } }
