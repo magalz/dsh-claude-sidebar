@@ -1,0 +1,1 @@
+{ "meta": { "title": "Claude sidebar: Jobs tab", "description": "Adds a Jobs tab that lists the session's background jobs, streams the live output of the one you expand and stops a running job when you confirm. It reads the jobs API inside dsh and sends nothing outside dsh." } }

@@ -1,0 +1,1 @@
+{ "meta": { "title": "Claude sidebar: Subagents tab", "description": "Adds a Subagents tab that shows the tree of subagents the session started with their state and model, with a click to open one in the sidebar and a second button to open it full screen. It reads the session's subagent data inside dsh and sends nothing outside dsh." } }

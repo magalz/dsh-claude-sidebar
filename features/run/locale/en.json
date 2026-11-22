@@ -1,0 +1,1 @@
+{ "meta": { "title": "Claude sidebar: Run button", "description": "Adds a Run button on chat code blocks that runs the block in a new terminal when you click it. It uses dsh's own terminal controller and sends nothing outside dsh." } }
