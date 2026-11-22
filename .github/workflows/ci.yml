@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    name: test (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [22, 24]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Check for package.json
+        id: package
+        shell: bash
+        run: |
+          if [ -f package.json ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run tests
+        if: steps.package.outputs.present == 'true'
+        shell: bash
+        run: npm test
+
+      - name: Check shipped files
+        if: steps.package.outputs.present == 'true'
+        shell: bash
+        run: npm run check
+
+      - name: Nothing to test
+        if: steps.package.outputs.present != 'true'
+        shell: bash
+        run: |
+          echo "No package.json yet: nothing to test."
+
+  ci-result:
+    name: CI result
+    if: always()
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every test job passed
+        shell: bash
+        run: '[ "${{ needs.test.result }}" = success ]'
