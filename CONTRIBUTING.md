@@ -9,8 +9,6 @@ Thanks for helping improve dsh-claude-sidebar.
 
 ## Commands
 
-Available once the plugin source (and its `package.json`) is in the repository:
-
 - `npm test` runs the `node:test` suites. They use fakes only and do not start a dsh process.
 - `npm run build` regenerates `client.js` from the sources. **Never edit `client.js` by hand** — it is generated.
 - `npm run check` verifies the syntax of the shipped files and that `client.js` is not stale.
@@ -25,7 +23,7 @@ Available once the plugin source (and its `package.json`) is in the repository:
 
 ## Trying a change in dsh
 
-Install this checkout as a local plugin from **Settings → Plugins → Add plugin**, or run `dsh plugin add <path>`. JavaScript changes take effect after restarting dsh.
+Install this checkout as a local plugin from **Plugins → Add plugin** with its absolute path, or run `dsh plugin add <path>`. JavaScript changes take effect after restarting dsh.
 
 ## Reporting bugs and security issues
 
