@@ -958,7 +958,8 @@ async function answerForRow(row) {
 }
 
 test('the route answers for the live working directory', async () => {
-  const MOVED = 'D:/Repos/live/ACL-12'
+  // The route only follows an absolute folder, and what is absolute depends on the platform.
+  const MOVED = process.platform === 'win32' ? 'D:/Repos/live/ACL-12' : '/repos/live/ACL-12'
 
   // cwd is where the session was created; the workingDirectory projection is where it works now.
   const moved = await answerForRow({
