@@ -4,7 +4,7 @@ A plugin for DeepSeek Harness (dsh) that adds a right sidebar in the style of Cl
 
 ## Requirements
 
-- DeepSeek Harness 0.2.x. The package declares `engines.dsh` as `>=0.2.2-0 <0.3.0`.
+- DeepSeek Harness 0.2.x. The package declares `engines.dsh` as `>=0.2.2-0 <0.2.3-0 || >=0.2.3-0 <0.3.0-0`.
 - Developed and tested on the Windows desktop app.
 
 ## Install
