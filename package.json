@@ -1,7 +1,7 @@
 {
   "name": "dsh-claude-sidebar",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "description": "Claude-desktop-style panels for the DeepSeek Harness right sidebar: an icon rail and tabs for the open session.",
   "license": "MIT",
   "author": "magalz",
