@@ -119,6 +119,7 @@ The plugin's code makes no requests to external services. Its browser code calls
 ## Known limits
 
 - Pane sizes rely on dsh internals that are not a public API. An app update can break them. The feature then does nothing and warns once in the console.
+- The Claude desktop layout cannot be matched yet because dsh has no public API for it: a pane cannot keep a fixed pixel width, the working views cannot form a grid (two docked panes, one horizontal split), and there is no wrap point around the shipped right sidebar, so the Environment column lives inside a tab instead of beside the chat. [Proposal: let plugins size right-sidebar panes](https://github.com/deepseek-ai/deepseek-harness/discussions/14030) in the dsh repository suggests what is missing; until it lands, pane sizing relies on the internals above.
 - It works with dsh 0.2.x only.
 - The interface is in English; only the icon rail's labels switch to Chinese when dsh or the browser is set to Chinese.
 - It has been tested on Windows only.
