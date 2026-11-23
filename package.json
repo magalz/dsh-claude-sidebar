@@ -21,7 +21,7 @@
     "claude"
   ],
   "engines": {
-    "dsh": ">=0.2.2-0 <0.3.0",
+    "dsh": ">=0.2.2-0 <0.2.3-0 || >=0.2.3-0 <0.3.0-0",
     "node": ">=22"
   },
   "type": "module",
@@ -76,7 +76,7 @@
     "test": "node --test \"test/*.test.mjs\""
   },
   "peerDependencies": {
-    "@deepseek-ai/dsh-tools": ">=0.2.2-0 <0.3.0",
+    "@deepseek-ai/dsh-tools": ">=0.2.2-0 <0.2.3-0 || >=0.2.3-0 <0.3.0-0",
     "@deepseek-ai/schemastery": ">=3.18.3 <4"
   },
   "dsh": {
