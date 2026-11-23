@@ -61,7 +61,7 @@ The rules above, as one sequence. Follow it in order, whether you are a person o
 1. Create the card first in the itsaplan project `ignis-dev.DCS` (web UI or API). A commit that names a card that does not exist is not accepted.
 2. Branch off `main` as `<type>/DCS-<n>-<slug>`, for example `docs/DCS-14-limits-and-pr-recipe`. One change per branch.
 3. Commit with a Conventional Commits subject (`docs:`, `fix:`, `feat:`, `test:`, `refactor:`, `chore:`), a body that says why, and a trailer block at the end: a DCO `Signed-off-by:` line and `Refs: DCS-N`. If you touched a source file, regenerate `client.js` in the same commit.
-4. Open the pull request against `main`. The body follows `.github/pull_request_template.md`: what and why, `Fixes DCS-N` on its own line, and the checklist ticked honestly. Agents: `gh pr create --body-file <filled template>`.
+4. Open the pull request against `main`. The body follows `.github/pull_request_template.md`: the Description, the Related card closed by `Fixes DCS-N` on its own line, the Type of change, the testing section, and the Checklist. Agents: `gh pr create --body-file <filled template>`.
 5. Wait for the checks. Branch protection blocks the merge until `CI result` is green (a four-job matrix: ubuntu and windows, Node 22 and 24). Poll `gh pr checks`, then merge with a merge commit: `gh pr merge --merge --delete-branch`. Never bypass the policy with `--admin`, and never merge past a red or pending check.
 
 ## Pull request lifecycle
