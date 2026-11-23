@@ -13,11 +13,14 @@ export const inject = ['webServer']
 export const FEATURES_ROUTE = '/dsh-claude-sidebar/features'
 
 export function apply(ctx) {
-  ctx.effect(() => ctx.webServer.register({ kind: 'exact', path: FEATURES_ROUTE, handler }), 'claude-sidebar: features route')
+  ctx.effect(() => ctx.webServer.register({ kind: 'exact', path: FEATURES_ROUTE, handler: createFeaturesHandler(ctx) }), 'claude-sidebar: features route')
 }
 
-function handler(req, res) {
-  if (!guard(req, res)) return
-  if (req.method !== 'GET') return reply(res, 405, { error: 'method not allowed' })
-  reply(res, 200, { features: getFeatures() })
+/** Build the features route handler; the shared guard needs the Host context for its Connection service. */
+function createFeaturesHandler(ctx) {
+  return function handler(req, res) {
+    if (!guard(ctx, req, res)) return
+    if (req.method !== 'GET') return reply(res, 405, { error: 'method not allowed' })
+    reply(res, 200, { features: getFeatures() })
+  }
 }

@@ -96,7 +96,7 @@ The plugin adds these routes to the dsh web server:
 | `/dsh-claude-sidebar/git` | The Git tab: branch, files, commits. |
 | `/dsh-claude-sidebar/git/diff` | The Git tab: the diff of one changed file. |
 
-All four are read-only: they answer `GET` and reject other methods. They also reject requests whose `Host` or `Origin` header, when present, does not name a loopback address (`127.0.0.1`, `localhost` or `::1`).
+All four are read-only: they answer `GET` and reject other methods. They also reject requests whose `Host` or `Origin` header, when present, does not name a loopback address (`127.0.0.1`, `localhost` or `::1`). Every route also passes through DSH's own connection access check (`ctx.connection.requestRejection`) before reading anything, and fails closed with 503 when the connection service is not mounted.
 
 ### What the routes read
 

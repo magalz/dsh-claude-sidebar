@@ -1,6 +1,8 @@
 /**
- * The loopback guard and the JSON reply shared by every Host route of this package.
- * The shape follows dsh-session-console lib/index.js:75-117.
+ * The guards and the JSON reply shared by every Host route of this package: loopback Host,
+ * cross-site Origin and dsh's own Connection access check. The loopback and reply shape follow
+ * dsh-session-console lib/index.js:75-117; the Connection gate follows
+ * dsh-subagent-panel-plus host.js:63-83 and fails closed when the service is not mounted.
  */
 
 /** Loopback hostname, as dsh-session-console lib/index.js:83-86 defines one. */
@@ -27,13 +29,32 @@ function originTrusted(req) {
   }
 }
 
-export function guard(req, res) {
+/**
+ * Refuse a request before any route reads data: Host, then Origin, then dsh's Connection gate
+ * (dsh-subagent-panel-plus host.js:63-83). A numeric rejection keeps its status; any other
+ * rejection answers 403. Returns false after answering, so the route just returns.
+ * @param {object} ctx - the Host plugin context, which mounts `connection` as a service.
+ * @param {import('node:http').IncomingMessage} req
+ * @param {import('node:http').ServerResponse} res
+ * @returns {boolean} whether the request may continue.
+ */
+export function guard(ctx, req, res) {
   if (!hostTrusted(req)) {
     reply(res, 403, { error: 'host-not-trusted' })
     return false
   }
   if (!originTrusted(req)) {
     reply(res, 403, { error: 'origin-not-trusted' })
+    return false
+  }
+  const gate = ctx.get('connection')
+  if (typeof gate?.requestRejection !== 'function') {
+    reply(res, 503, { error: 'connection service is not mounted' })
+    return false
+  }
+  const rejection = gate.requestRejection(req)
+  if (rejection !== undefined && rejection !== null && rejection !== false) {
+    reply(res, typeof rejection === 'number' ? rejection : 403, { error: 'request rejected' })
     return false
   }
   return true

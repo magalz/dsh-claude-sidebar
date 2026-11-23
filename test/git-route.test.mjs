@@ -108,9 +108,10 @@ function defaultAnswers(overrides = {}) {
 function fakeHost({ rows = [{ sessionId: 's1', cwd: SESSION_CWD }], services = {}, deps = {} } = {}) {
   const registered = []
   const controller = services.sessionController ?? { list: async () => ({ items: rows }) }
+  const mounted = { connection: { requestRejection: () => undefined }, ...services }
   const ctx = {
     effect(effect) { return effect() },
-    get(name) { return name === 'sessionController' ? controller : services[name] },
+    get(name) { return name === 'sessionController' ? controller : mounted[name] },
     webServer: { register(route) { registered.push(route); return () => {} } },
     logger: { warn() {} },
   }
@@ -589,6 +590,39 @@ test('the git routes are guarded, method-checked and answer 404 for an unknown s
   const noCwd = fakeHost({ rows: [{ sessionId: 's1' }], deps: { git } })
   const missingCwd = await call(noCwd.route, { url: OVERVIEW_URL })
   assert.equal(missingCwd.status, 404)
+})
+
+test('the git routes fail closed when the connection service is missing', async () => {
+  const { git } = gitFake(defaultAnswers())
+  for (const connection of [null, {}]) {
+    const host = fakeHost({ services: { connection }, deps: { git } })
+    for (const [route, url] of [[host.route, OVERVIEW_URL], [host.diffRoute, diffUrl('notes.md')]]) {
+      const answer = await call(route, { url })
+      assert.equal(answer.status, 503)
+      assert.deepEqual(answer.body, { error: 'connection service is not mounted' })
+      assert.equal(answer.headers['Cache-Control'], 'no-store')
+    }
+  }
+})
+
+test('the git routes honor a Connection gate rejection', async () => {
+  const { git } = gitFake(defaultAnswers())
+  const seen = []
+  const host = fakeHost({
+    services: { connection: { requestRejection(req) { seen.push(req); return 401 } } },
+    deps: { git },
+  })
+  for (const [route, url] of [[host.route, OVERVIEW_URL], [host.diffRoute, diffUrl('notes.md')]]) {
+    const answer = await call(route, { url })
+    assert.equal(answer.status, 401)
+    assert.deepEqual(answer.body, { error: 'request rejected' })
+  }
+  assert.equal(seen.length, 2, 'both git routes consult the gate')
+  const objectRejection = fakeHost({
+    services: { connection: { requestRejection: () => ({ deny: true }) } },
+    deps: { git },
+  })
+  assert.equal((await call(objectRejection.route, { url: OVERVIEW_URL })).status, 403)
 })
 
 test('an unexpected failure answers 500 with the message only', async () => {

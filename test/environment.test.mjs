@@ -64,7 +64,8 @@ const FILES = {
   'D:/Repos/example-repo/.worktrees/ACL-12.progress.md': '# Progress\n\nCard ACL-12 in review.\n',
 }
 
-/** A stand-in for the dsh services the Host route uses; the returned route is the real handler. */
+/** A stand-in for the dsh services the Host route uses; the returned route is the real handler.
+ *  Its Connection service allows requests unless a test overrides it. */
 function fakeHost({
   rows = [{ sessionId: 's1', cwd: WORKTREE }],
   services = {},
@@ -76,11 +77,12 @@ function fakeHost({
   const controller = services.sessionController ?? {
     list: async () => ({ items: rows }),
   }
+  const mounted = { connection: { requestRejection: () => undefined }, ...services }
   const ctx = {
     effect(effect) { return effect() },
     get(name) {
       reads.push(name)
-      return name === 'sessionController' ? controller : services[name]
+      return name === 'sessionController' ? controller : mounted[name]
     },
     webServer: { register(route) { registered.push(route); return () => {} } },
     logger: { warn() {} },
@@ -853,6 +855,25 @@ test('the environment route is guarded', async () => {
   assert.equal(missing.status, 404)
   assert.equal(typeof missing.body.error, 'string')
   assert.deepEqual(Object.keys(missing.body), ['error'], 'a 404 carries the error and no facts')
+})
+
+test('the environment route fails closed when the connection service is missing', async () => {
+  for (const connection of [null, {}]) {
+    const host = fakeHost({ services: { connection } })
+    const answer = await call(host.route)
+    assert.equal(answer.status, 503)
+    assert.deepEqual(answer.body, { error: 'connection service is not mounted' })
+    assert.equal(answer.headers['Cache-Control'], 'no-store')
+  }
+})
+
+test('the environment route honors a Connection gate rejection', async () => {
+  const seen = []
+  const host = fakeHost({ services: { connection: { requestRejection(req) { seen.push(req); return 401 } } } })
+  const answer = await call(host.route)
+  assert.equal(answer.status, 401)
+  assert.deepEqual(answer.body, { error: 'request rejected' })
+  assert.equal(seen.length, 1, 'the gate sees the incoming request')
 })
 
 /* ------------------------------------------------------------------ */
