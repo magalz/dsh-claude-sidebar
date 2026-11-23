@@ -97,7 +97,7 @@ function createEnvironmentHandler(ctx, config = {}, deps = {}) {
   const git = deps.git ?? gitRunner(ctx)
   const machine = { hostname: deps.hostname ?? osHostname(), platform: deps.platform ?? process.platform }
   return async function handler(req, res) {
-    if (!guard(req, res)) return
+    if (!guard(ctx, req, res)) return
     if (req.method !== 'GET') return reply(res, 405, { error: 'method not allowed' })
     try {
       const url = new URL(req.url ?? '/', 'http://127.0.0.1')

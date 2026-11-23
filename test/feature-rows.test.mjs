@@ -22,10 +22,16 @@ const ROWS = [
   { feature: 'browser', id: 'claude-sidebar-browser', spec: 'dsh-claude-sidebar/browser', title: 'Claude sidebar: open in Browser' },
 ]
 
-/** A Host ctx that runs effects now, records route registrations and keeps dispose callbacks. */
-function fakeCtx() {
+/**
+ * A Host ctx that runs effects now, records route registrations and keeps dispose callbacks.
+ * Its Connection service allows requests unless a test passes a rejecting or missing one.
+ */
+function fakeCtx({ connection } = {}) {
   const disposes = []
   const registered = []
+  const services = {
+    connection: connection === undefined ? { requestRejection: () => undefined } : connection,
+  }
   return {
     disposes,
     registered,
@@ -34,7 +40,7 @@ function fakeCtx() {
       if (typeof dispose === 'function') disposes.push(dispose)
       return dispose
     },
-    get() { return undefined },
+    get(name) { return services[name] },
     webServer: { register(route) { registered.push(route); return () => {} } },
   }
 }
@@ -96,6 +102,31 @@ test('the root row registers a guarded, method-checked, no-store features route'
     assert.equal(wrongMethod.headers['Cache-Control'], 'no-store')
   } finally {
     enabled.disposes.forEach(dispose => dispose())
+  }
+})
+
+test('the features route fails closed when the connection service is missing', async () => {
+  for (const connection of [null, {}]) {
+    const ctx = fakeCtx({ connection })
+    applyRoot(ctx)
+    const route = ctx.registered.find(item => item.path === FEATURES_ROUTE)
+    const answer = await call(route)
+    assert.equal(answer.status, 503)
+    assert.deepEqual(answer.body, { error: 'connection service is not mounted' })
+    assert.equal(answer.headers['Cache-Control'], 'no-store')
+  }
+})
+
+test('the features route honors a Connection gate rejection', async () => {
+  for (const [rejection, status] of [[401, 401], [403, 403], [{ reason: 'blocked' }, 403]]) {
+    const seen = []
+    const ctx = fakeCtx({ connection: { requestRejection(req) { seen.push(req); return rejection } } })
+    applyRoot(ctx)
+    const route = ctx.registered.find(item => item.path === FEATURES_ROUTE)
+    const answer = await call(route)
+    assert.equal(answer.status, status)
+    assert.deepEqual(answer.body, { error: 'request rejected' })
+    assert.equal(seen.length, 1, 'the gate sees the incoming request')
   }
 })
 

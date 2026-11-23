@@ -64,7 +64,7 @@ export function installGit(ctx, deps = {}) {
 function createGitHandler(ctx, deps = {}) {
   const git = deps.git ?? gitRunner(ctx)
   return async function handler(req, res) {
-    if (!guard(req, res)) return
+    if (!guard(ctx, req, res)) return
     if (req.method !== 'GET') return reply(res, 405, { error: 'method not allowed' })
     try {
       const url = new URL(req.url ?? '/', 'http://127.0.0.1')
@@ -183,7 +183,7 @@ function createGitDiffHandler(ctx, deps = {}) {
   const lstatOf = deps.lstat ?? lstat
   const realpathOf = deps.realpath ?? realpath
   return async function handler(req, res) {
-    if (!guard(req, res)) return
+    if (!guard(ctx, req, res)) return
     if (req.method !== 'GET') return reply(res, 405, { error: 'method not allowed' })
     try {
       const url = new URL(req.url ?? '/', 'http://127.0.0.1')
